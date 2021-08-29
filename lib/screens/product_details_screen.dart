@@ -21,12 +21,32 @@ class ProductDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title:Text( loadedProduct.title,),),
-      body: Container(
-        child: Center(
-          child: Text(loadedProduct.description,
-          style: TextStyle(color: Theme.of(context).accentColor),),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+          height: 300,
+          width: double.infinity,
+          child: Image.network(loadedProduct.imageUrl, fit: BoxFit.cover,),
         ),
-      ),
+            SizedBox(height: 10,),
+            Text('\$${loadedProduct.price}',
+              style:TextStyle(
+                color: Colors.grey,
+                fontSize: 20,
+              ) ,),
+            SizedBox(height: 10,),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              width: double.infinity,// to take as much space as available
+              child: Text(loadedProduct.description,
+              textAlign: TextAlign.center,
+                softWrap: true,// softwrap takes the text to a new line if its gets too much
+              ),
+            ),
+          ],
+        ),
+      )
     );
   }
 }

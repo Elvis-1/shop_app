@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/cart.dart';
+import '../widget/cart_item.dart' ;
+import '../providers/cart.dart' show Cart;
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -36,7 +37,13 @@ class CartScreen extends StatelessWidget {
           ),
           // ListView can't be used directly in a column
           SizedBox(height: 10,),
-          Expanded(child: ListView.builder(itemCount: cart.items.length, itemBuilder:(ctx,i) => ))
+          Expanded(child: ListView.builder(itemCount: cart.items.length, itemBuilder:(ctx,i) =>
+          // we need to access values as we are accessing a map
+              CartItem(
+                  cart.items.values.toList()[i].id,cart.items.values.toList()[i].price,
+                  cart.items.values.toList()[i].quantity,
+                  cart.items.values.toList()[i].title,
+                  cart.items.keys.toList()[i])))
         ],
       ),
     );

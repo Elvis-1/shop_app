@@ -12,6 +12,10 @@ To use the provider packaged that was installed import 'package:provider/provide
 I faced this problem:
 The argument type 'Widget?' can't be assigned to the parameter type 'Widget'., To solve i add '!' i.e child:ch!
  ListView can't be used directly in a column, Use Expanded instead, expanded takes the availble space.
+
+ ISSUE
+ Because CartItem was repeated, we had the error: CartItem' isn't a function.
+ To solve, we imported it as import '../widget/cart_item.dart' as ci; and added it sd ci.CartItem
  -->
 </body>
 </html>
