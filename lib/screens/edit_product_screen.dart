@@ -90,8 +90,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
        return;
      }
      _form.currentState!.save();
-     Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
-     // set listen to false since we are not interested in all the changes that happen to product except the addproduct
+     if(_editedProduct.id !=''){
+       Provider.of<Products>(context, listen: false).updateProduct(_editedProduct.id,_editedProduct);
+     }else{
+       Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+       // set listen to false since we are not interested in all the changes that happen to product except the addproduct
+     }
+
     Navigator.of(context).pop(); // this takes us to the previous page
       // print(_editedProduct.title);
       // print(_editedProduct.description);
@@ -131,8 +136,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     title: value!,
                     description: _editedProduct.description,
                     imageUrl: _editedProduct.imageUrl,
-                    id: _editedProduct.id,
-                      price:_editedProduct.price
+                      price:_editedProduct.price,
+                      id: _editedProduct.id,
+                    isFavorite:_editedProduct.isFavorite
                   );
                 },
               ),
@@ -162,7 +168,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       title: _editedProduct.title,
       description: _editedProduct.description,
       imageUrl: _editedProduct.imageUrl,
-      id: _editedProduct.id,
+          id: _editedProduct.id,
+          isFavorite:_editedProduct.isFavorite,
       price:double.parse(value!), // convert to int as value is string
       );
       },
@@ -188,6 +195,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       description: value!,
                       imageUrl: _editedProduct.imageUrl,
                       id: _editedProduct.id,
+                      isFavorite:_editedProduct.isFavorite,
                       price:_editedProduct.price
                   );
                 },
@@ -221,16 +229,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         _saveForm();
                       },
                       validator: (value){
-                        // if(value!.isEmpty){
-                        //   return 'Please enter a url';
-                        // }
-                        // if(!value.startsWith('http') && !value.startsWith('https')){
-                        //   return 'Please enter a valid url ';
-                        // }
-                        // if(!value.endsWith('.png') || !value.endsWith('.jpg') || !value.endsWith('.jpeg')){
-                        //   return '';
-                        // }
-
+                   //      if(value!.isEmpty){
+                   //        return 'Please enter a url';
+                   //      }
+                   //      if(!value.startsWith('http') && !value.startsWith('https')){
+                   //        return 'Please enter a valid url ';
+                   //      }
+                   //      if(!value.endsWith('.png') || !value.endsWith('.jpg') || !value.endsWith('.jpeg')){
+                   //        return '';
+                   //      }
+                   // return null;
                       },
                       onSaved: (value){
                         _editedProduct = Product(
@@ -238,6 +246,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             description: _editedProduct.description,
                             imageUrl: value!,
                             id: _editedProduct.id,
+                            isFavorite:_editedProduct.isFavorite,
                             price:_editedProduct.price
                         );
                       },
