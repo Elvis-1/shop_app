@@ -17,18 +17,49 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _imageUrlController = TextEditingController();
   final _imageUrlFocusNode = FocusNode(); // since FocusNode doesn't work with image textfields, we are setting up our own listener
   final _form = GlobalKey<FormState>();
+
   var _editedProduct = Product(
       id: '',
       title: '',
       price: 0,
       description: '',
-      imageUrl: '');
-  
+      imageUrl: ''
+  );
+  var _initValues = {
+    'title' : '',
+    'description' : '',
+    'price':'',
+    'imageUrl' : ''
+  };
+
+  var _isInit = true;
+
   @override
   void initState() {
     // TODO: implement initState
     _imageUrlFocusNode.addListener(_updateImageUrl);
     super.initState();
+  }
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    if(_isInit == true){
+   final productId = ModalRoute.of(context);
+   if(productId != null){
+   final productIds = productId.settings.arguments as String;
+     _editedProduct = Provider.of<Products>(context, listen: false).findById(productIds);
+     _initValues = {
+       'title': _editedProduct.title,
+       'description':_editedProduct.description,
+       'price': _editedProduct.price.toString(),
+       // 'imageUrl': _editedProduct.imageUrl'
+       'imageUrl': ''
+   };
+    _imageUrlController.text = _editedProduct.imageUrl;
+   }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
   }
   @override
   void dispose() { // This will help dispose the focus nodes and avoid memory leaks once the screen is off
@@ -46,7 +77,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           (!_imageUrlController.text.startsWith('http') && !_imageUrlController.text.startsWith('https'))||
           (!_imageUrlController.text.endsWith('.png') &&
           !_imageUrlController.text.endsWith('.jpg') &&
-          !_imageUrlController.text.endsWith('.jpeg')) ){
+          !_imageUrlController.text.endsWith('.jpeg'))){
         return ;
       }
 
@@ -83,6 +114,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: ListView(
             children: [
               TextFormField(
+                initialValue: _initValues['title'],
                 decoration: InputDecoration(labelText:'Title'),
               textInputAction: TextInputAction.next,
                 onFieldSubmitted:(_){
@@ -105,6 +137,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: _initValues['price'],
                 decoration: InputDecoration(labelText:'Price'),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.number,
@@ -135,6 +168,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       },
               ),
               TextFormField(
+                initialValue: _initValues['description'],
                 decoration: InputDecoration(labelText:'Description'),
                 maxLines: 3,// default lines
                 keyboardType: TextInputType.multiline,
@@ -177,6 +211,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      // initialValue: _initValues['imageUrl'],// You can't use initial value and controller together
                       decoration: InputDecoration(labelText: 'Image Url'),
                       keyboardType: TextInputType.url,
                       textInputAction: TextInputAction.done,
@@ -186,16 +221,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         _saveForm();
                       },
                       validator: (value){
-                        if(value!.isEmpty){
-                          return 'Please enter a url';
-                        }
-                        if(!value.startsWith('http') && !value.startsWith('https')){
-                          return 'Please enter a valid url ';
-                        }
-                        if(!value.endsWith('.png') || !value.endsWith('.jpg') || !value.endsWith('.jpeg')){
-                          return '';
-                        }
-                        return null;
+                        // if(value!.isEmpty){
+                        //   return 'Please enter a url';
+                        // }
+                        // if(!value.startsWith('http') && !value.startsWith('https')){
+                        //   return 'Please enter a valid url ';
+                        // }
+                        // if(!value.endsWith('.png') || !value.endsWith('.jpg') || !value.endsWith('.jpeg')){
+                        //   return '';
+                        // }
+
                       },
                       onSaved: (value){
                         _editedProduct = Product(
