@@ -44,19 +44,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     if(_isInit == true){
-   final productId = ModalRoute.of(context);
-   if(productId != null){
-   final productIds = productId.settings.arguments as String;
-     _editedProduct = Provider.of<Products>(context, listen: false).findById(productIds);
+   final productId = ModalRoute.of(context)?.settings.arguments.toString(); // This does not work in init state, it would have been a perfect place to use it
+  print(productId);
+  print(productId.runtimeType);
+  // product id returns null when i try to create a new product
+   if(productId!.isNotEmpty){
+     _editedProduct = Provider.of<Products>(context, listen: false).findById(productId);
      _initValues = {
        'title': _editedProduct.title,
        'description':_editedProduct.description,
        'price': _editedProduct.price.toString(),
        // 'imageUrl': _editedProduct.imageUrl'
-       'imageUrl': ''
-   };
-    _imageUrlController.text = _editedProduct.imageUrl;
+       'imageUrl': '',
+     };
+     _imageUrlController.text = _editedProduct.imageUrl;
+
    }
+
     }
     _isInit = false;
     super.didChangeDependencies();
@@ -86,7 +90,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
   void _saveForm(){
      final isValid = _form.currentState!.validate(); // this will trigger all the validator
-     if(!isValid){
+     if(isValid){
        return;
      }
      _form.currentState!.save();
