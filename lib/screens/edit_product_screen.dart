@@ -33,6 +33,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   };
 
   var _isInit = true;
+  var _isLoading = false;
 
   @override
   void initState() {
@@ -44,22 +45,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     if(_isInit == true){
-   final productId = ModalRoute.of(context)?.settings.arguments.toString(); // This does not work in init state, it would have been a perfect place to use it
-  print(productId);
-  print(productId.runtimeType);
-  // product id returns null when i try to create a new product
-   if(productId!.isNotEmpty){
-     _editedProduct = Provider.of<Products>(context, listen: false).findById(productId);
-     _initValues = {
-       'title': _editedProduct.title,
-       'description':_editedProduct.description,
-       'price': _editedProduct.price.toString(),
-       // 'imageUrl': _editedProduct.imageUrl'
-       'imageUrl': '',
-     };
-     _imageUrlController.text = _editedProduct.imageUrl;
+   final productId = ModalRoute.of(context)!.settings.arguments as String;
+    // productId return null when i try to create new product, to continue with the course, i had to comment it out, to be able to edit, i had to uncomment it
 
-   }
+    _editedProduct = Provider.of<Products>(context, listen: false).findById(productId);
+    _initValues = {
+    'title': _editedProduct.title,
+    'description':_editedProduct.description,
+    'price': _editedProduct.price.toString(),
+    // 'imageUrl': _editedProduct.imageUrl'
+    'imageUrl': '',
+    };
+    _imageUrlController.text = _editedProduct.imageUrl;
 
     }
     _isInit = false;
@@ -88,20 +85,52 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {});
     }
   }
-  void _saveForm(){
+  Future<void> _saveForm() async{
+
      final isValid = _form.currentState!.validate(); // this will trigger all the validator
-     if(isValid){
+     if(!isValid){
        return;
      }
      _form.currentState!.save();
-     if(_editedProduct.id !=''){
-       Provider.of<Products>(context, listen: false).updateProduct(_editedProduct.id,_editedProduct);
-     }else{
-       Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+     setState(() {
+       _isLoading = true;
+     });
+
+     if(_editedProduct.id != ''){
+      await Provider.of<Products>(context, listen: false).updateProduct(_editedProduct.id,_editedProduct);
+
+     }else {
+       try {
+         await Provider.of<Products>(context, listen: false).addProduct(
+             _editedProduct);
+       } catch (error) {
+         await showDialog(context: context, builder: (ctx) =>
+             AlertDialog(
+               title: Text('An error occured'),
+               content: Text('Something went wrong'),
+               actions: [
+                 FlatButton(
+                     onPressed: () {
+                       Navigator.of(ctx).pop();
+                     }
+                     , child: Text('Okay'))
+               ],
+             )
+
+         );
+       // }finally{
+       //   setState(() {
+       //     _isLoading = false;
+       //   });
+         Navigator.of(context).pop();
+       }
        // set listen to false since we are not interested in all the changes that happen to product except the addproduct
      }
-
-    Navigator.of(context).pop(); // this takes us to the previous page
+     setState(() {
+       _isLoading = false;
+     });
+     Navigator.of(context).pop(); // this takes us to the previous page
+    // Navigator.of(context).pop(); // this takes us to the previous page
       // print(_editedProduct.title);
       // print(_editedProduct.description);
       // print(_editedProduct.price);
@@ -116,7 +145,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
           IconButton(onPressed: _saveForm, icon: Icon(Icons.save)),
         ],
       ),
-      body: Padding(
+      body:_isLoading?  Center(
+        child: CircularProgressIndicator(),
+      ):
+      Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _form,

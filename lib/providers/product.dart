@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'dart:convert'; // import this to convert to json
+import 'package:http/http.dart' as http;
 
 
 class Product with ChangeNotifier {
@@ -18,9 +20,24 @@ class Product with ChangeNotifier {
     this.isFavorite = false
   });
 
-  void toggleFavorite(){
+  Future<void> toggleFavorite() async{
+  final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
+  final url = 'https://myapp-a30dc.firebaseio.com/product/$id.json';
+  try{
+  final response = await  http.patch(Uri.parse(url), body: json.encode({ // import 'dart:convert'; import this to use json.encode to json
+      'isFavorite':isFavorite,
+    }));
+  if(response.statusCode >= 400){
+    isFavorite = oldStatus;
+    notifyListeners();
+  }
+  }catch(error){
+  isFavorite = oldStatus;
+  notifyListeners();
+  }
+
   }
 
 }

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../widget/app_drawer.dart';
 import './cart_screen.dart';
 import '../providers/cart.dart';
-
+import '../providers/products.dart';
 import '../widget/product_grid.dart';
 import '../widget/badge.dart';
 
@@ -22,6 +22,39 @@ class ProductsOverViewScreen extends StatefulWidget {
 
 class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
   var _showOnlyFavorites = false;
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    // we want to get and load products from the database immediately the app loads, as we already know that init state runs once
+    // Provider.of<Products>(context).fetchAndSetProducts(); //WON'T WORK. Generally, of(context) don't work in init state
+    // Future.delayed(Duration.zero).then((_){
+    //   Provider.of<Products>(context).fetchAndSetProducts();
+    // });
+    super.initState();
+  }
+  @override
+  void didChangeDependencies() {
+    // didchangeDependencies runs many times, even after the builder has loaded
+    // TODO: implement didChangeDependencies
+    if(_isInit == true){
+      setState(() {
+        _isLoading = true;
+      });
+
+      Provider.of<Products>(context).fetchAndSetProducts().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +97,8 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(_showOnlyFavorites),
+      body:_isLoading? Center(
+          child: CircularProgressIndicator()) : ProductsGrid(_showOnlyFavorites),
     );
   }
 }
