@@ -20,11 +20,11 @@ class Product with ChangeNotifier {
     this.isFavorite = false
   });
 
-  Future<void> toggleFavorite() async{
+  Future<void> toggleFavorite(String token) async{
   final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
-  final url = 'https://myapp-a30dc.firebaseio.com/product/$id.json';
+  final url = 'https://myapp-a30dc.firebaseio.com/product/$id.json?auth=$token';
   try{
   final response = await  http.patch(Uri.parse(url), body: json.encode({ // import 'dart:convert'; import this to use json.encode to json
       'isFavorite':isFavorite,

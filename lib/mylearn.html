@@ -25,6 +25,16 @@ The argument type 'Widget?' can't be assigned to the parameter type 'Widget'., T
  To check run time type, use name.runtimeType
 
  To add http, go to flutter http and add the package
+
+ To use database authentication, change rules to:
+ {
+  "rules": {
+    ".read": "auth != null",  // 2021-10-1
+    ".write": "auth != null",  // 2021-10-1
+  }
+}
+And enable email and password signup method
+
  -->
 </body>
 </html>
