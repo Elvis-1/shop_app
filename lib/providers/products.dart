@@ -1,4 +1,6 @@
+import 'dart:convert'; // import this to convert to json
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http; // as http will help to avoid name clashes
 import 'product.dart';
 
 class Products with ChangeNotifier{
@@ -63,6 +65,7 @@ class Products with ChangeNotifier{
   // }
 
   void addProduct(Product product){
+
     final newProduct = Product(
       title: product.title,
       description: product.description,

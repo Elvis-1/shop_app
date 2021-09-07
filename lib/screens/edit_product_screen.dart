@@ -44,22 +44,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     if(_isInit == true){
-   final productId = ModalRoute.of(context)?.settings.arguments.toString(); // This does not work in init state, it would have been a perfect place to use it
-  print(productId);
-  print(productId.runtimeType);
-  // product id returns null when i try to create a new product
-   if(productId!.isNotEmpty){
-     _editedProduct = Provider.of<Products>(context, listen: false).findById(productId);
-     _initValues = {
-       'title': _editedProduct.title,
-       'description':_editedProduct.description,
-       'price': _editedProduct.price.toString(),
-       // 'imageUrl': _editedProduct.imageUrl'
-       'imageUrl': '',
-     };
-     _imageUrlController.text = _editedProduct.imageUrl;
+   //final productId = ModalRoute.of(context)!.settings.arguments as String;
+    // productId return null when i try to create new product, to continue with the course, i had to comment it out, to be able to edit, i had to uncomment it
 
-   }
+    //_editedProduct = Provider.of<Products>(context, listen: false).findById(productId);
+    _initValues = {
+    'title': _editedProduct.title,
+    'description':_editedProduct.description,
+    'price': _editedProduct.price.toString(),
+    // 'imageUrl': _editedProduct.imageUrl'
+    'imageUrl': '',
+    };
+    _imageUrlController.text = _editedProduct.imageUrl;
 
     }
     _isInit = false;
@@ -90,11 +86,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
   void _saveForm(){
      final isValid = _form.currentState!.validate(); // this will trigger all the validator
-     if(isValid){
+     if(!isValid){
        return;
      }
      _form.currentState!.save();
-     if(_editedProduct.id !=''){
+     if(_editedProduct.id != ''){
        Provider.of<Products>(context, listen: false).updateProduct(_editedProduct.id,_editedProduct);
      }else{
        Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
