@@ -37,7 +37,7 @@ class ProductItem extends StatelessWidget {
           builder: (ctx,product, child) => IconButton(
             // child is a part of the consumer that does not listen to the notification
             onPressed: (){
-              product.toggleFavorite(authData.token);
+              product.toggleFavorite(authData.token, authData.userId);
             },
             icon: Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 color: Theme.of(context).accentColor

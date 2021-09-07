@@ -41,9 +41,10 @@ class Products with ChangeNotifier{
   ];
  var _showFavoritesOnly = false;
 
-final String authToken;
+final String? authToken;
+final String? userId;
 
-Products(this.authToken, this._items);
+Products(this.authToken,this.userId, this._items);
 
   List<Product> get items {
     // if(_showFavoritesOnly == true){
@@ -68,12 +69,17 @@ Products(this.authToken, this._items);
   //   notifyListeners();
   // }
 
-  Future<void> fetchAndSetProducts() async{
-    final url = 'https://myapp-a30dc.firebaseio.com/product.json?auth=$authToken';
+  Future<void> fetchAndSetProducts([bool filterByUser=false]) async{
+    final filterString = filterByUser? 'orderBy="creatorId"&equalTo="$userId"':'';
+    var url = 'https://myapp-a30dc.firebaseio.com/product.json?auth=$authToken&$filterString';
     try{
       final response = await http.get(Uri.parse(url));
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-      final List<Product> loadedProducts = [Product(
+      url = 'https://myapp-a30dc.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(Uri.parse(url));
+      final favoriteData = json.decode(favoriteResponse.body);
+      final List<Product> loadedProducts = [
+        Product(
           id: 'p3',
           title: 'Yellow Scarf',
           description: 'Warm and cozy - exactly what you need for the winter.',
@@ -89,7 +95,7 @@ Products(this.authToken, this._items);
           title: prodData['title'],
           description: prodData['description'],
           price: prodData['price'],
-          isFavorite: prodData['isFavorite'],
+          isFavorite: favoriteData[prodId],
           imageUrl: prodData['imageUrl']
         ));
       });
@@ -111,7 +117,7 @@ Products(this.authToken, this._items);
         'description': product.description,
         'price': product.price,
         'imageUrl': product.imageUrl,
-        'isFavorite': product.isFavorite,
+        'creatorId':userId,
       }),);
 
       print(json.decode(response.body));

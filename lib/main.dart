@@ -26,8 +26,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
             value: Auth()),
         ChangeNotifierProxyProvider<Auth,Products>(
-          create: (BuildContext context) => Products(Provider.of<Auth>(context, listen:false).token,[]),
-          update: (_,auth,previousProducts) => Products(auth.token,previousProducts == null? []:previousProducts.items),
+          create: (BuildContext context) => Products(Provider.of<Auth>(context, listen:false).token,Provider.of<Auth>(context, listen:false).userId,[]),
+          update: (_,auth,previousProducts) => Products(auth.token,auth.userId,previousProducts == null? []:previousProducts.items),
         ),
 
     // create: (ctx) => Products(), // where products() is a new instance of the provider class
@@ -37,8 +37,8 @@ class MyApp extends StatelessWidget {
         // ChangeNotifierProvider.value(
         //     value: Orders(),),
         ChangeNotifierProxyProvider<Auth,Orders>(
-            create:(BuildContext context) => Orders(Provider.of<Auth>(context).token,[]),
-           update: (_,auth, previousOrders) => Orders(Provider.of<Auth>(context).token,[]),),
+            create:(BuildContext context) => Orders(Provider.of<Auth>(context).token,Provider.of<Auth>(context).userId,[]),
+           update: (_,auth, previousOrders) => Orders(auth.token,auth.userId,[]),),
     ],
 
 

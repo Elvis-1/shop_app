@@ -1,21 +1,27 @@
 import 'dart:convert';
+import 'dart:async';// this will help us to use timer for out autologout
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/http_exception.dart';
 
 class Auth with ChangeNotifier{
-  String _token = '';
-  DateTime _expireDate = DateTime.now();
-  String _userId = '';
+  String? _token;
+  DateTime? _expireDate = DateTime.now();
+  String? _userId;
+  Timer? _authTimer;
 
   bool get isAuth{
-    return token != '';
+    return token != null;
   }
-  String get token {
-    if( _expireDate.isAfter(DateTime.now()) && _token != ''){
-      return _token;
-    }
-    return '';
+  String? get token {
+    // if( _expireDate!.isAfter(DateTime.now()) && _token != null){
+    //   return _token;
+    // }
+    return 'five';
+  }
+
+  String? get userId{
+    return _userId;
   }
   //Auth(this._token, this._expireDate, this._userId);
  // To use auth, go to firebase auth api, also note that for more secured authentication, use firebase docs or take a course on it
@@ -38,6 +44,7 @@ Future<void> _authenticate(String email, String password, String urlSegment) asy
     _expireDate = DateTime.now().add(Duration(
       seconds: int.parse(responseData['expiresIn'])
     ));
+    _autoLogout();
     // print(json.decode(response.body));
     notifyListeners();
   }catch(error){
@@ -76,5 +83,22 @@ Future<void> _authenticate(String email, String password, String urlSegment) asy
   //   ) );
   //   print(json.decode(response.body));
   // }
+void logout(){
+    _token = null;
+    _userId = null;
+    _expireDate = null;
+    if(_authTimer != null){
+      _authTimer!.cancel();
+      _authTimer = null;
+    }
+    notifyListeners();
 
+}
+ void _autoLogout(){
+    if(_authTimer != null){
+      _authTimer!.cancel();
+    }
+    final timeToExpire = _expireDate!.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(Duration(seconds:3), logout);
+ }
 }

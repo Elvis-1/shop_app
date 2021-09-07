@@ -18,16 +18,17 @@ class OrderItem{
 }
 class Orders with ChangeNotifier{
   List<OrderItem> _orders = [];
-  final String authToken;
+  final String? authToken;
+  final String? userId;
 
-  Orders(this.authToken,this._orders);
+  Orders(this.authToken,this.userId,this._orders);
 
   List<OrderItem> get orders{
     return [..._orders];
   }
 
   Future<void> fetchAndSetOrders() async{
-    final url = 'https://myapp-a30dc.firebaseio.com/orders.json?auth=$authToken';
+    final url = 'https://myapp-a30dc.firebaseio.com/orders/$userId.json?auth=$authToken';
     final response = await http.get(Uri.parse(url));
     final List<OrderItem> loadedOrders = [];
 
@@ -52,7 +53,7 @@ class Orders with ChangeNotifier{
     notifyListeners();
   }
   Future<void> addOrder(List<CartItem> cartProducts, double total) async{
-    final url = 'https://myapp-a30dc.firebaseio.com/orders.json?auth=$authToken';
+    final url = 'https://myapp-a30dc.firebaseio.com/orders/$userId.json?auth=$authToken';
     final timeStamp = DateTime.now(); // this will help to make the time been sent to the server and the one stored locally equal
     final response = await http.post(Uri.parse(url), body: json.encode({
       'amount': total,
