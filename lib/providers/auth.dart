@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'dart:async';// this will help us to use timer for out autologout
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../models/http_exception.dart';
 
@@ -47,6 +49,13 @@ Future<void> _authenticate(String email, String password, String urlSegment) asy
     _autoLogout();
     // print(json.decode(response.body));
     notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.encode({
+      'token':_token,
+      'userId': _userId,
+      'expireDate': _expireDate!.toIso8601String()
+    });
+    prefs.setString('userData', userData);
   }catch(error){
     throw error;
   }
@@ -83,6 +92,17 @@ Future<void> _authenticate(String email, String password, String urlSegment) asy
   //   ) );
   //   print(json.decode(response.body));
   // }
+  Future<bool?> tryAutoLogin() async{
+    final prefs = await SharedPreferences.getInstance();
+    if(!prefs.containsKey('userData')){
+      return false;
+    }
+    //final extractedUserData = json.decode(prefs.getString('userData')) as Map<String, Object>;
+    //final expireDate = DateTime.parse(extractedUserData['expireDate']);
+    // if(expireDate.isBefore(DateTime.now())){
+    //   return false;
+    // }
+  }
 void logout(){
     _token = null;
     _userId = null;
